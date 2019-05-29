@@ -19,7 +19,8 @@ def save_image(div, title, folder):
 
     image_request = requests.get(img_url, headers={'User-Agent' : "Magic Browser"})
     if image_request.status_code == 200:
-        filename = f"./{folder}/Ch.{title}/{chapter}{img_page}.jpg"
+        filename = f"./{folder}/{title}/{chapter}{img_page}.jpg"
+        print(filename)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(filename, 'wb') as f:
             f.write(image_request.content)
@@ -31,7 +32,11 @@ def download_chapter(path, driver, folder):
     driver.get(url)
 
     soup = BeautifulSoup(driver.page_source, 'html.parser')
-    title = soup.find("option", selected=True).contents[0].replace(":", "-")
+    title = soup.find("option", selected=True).contents[0] \
+        .replace(":", "-") \
+        .replace("\"", "'") \
+        .replace("...", "") \
+        .replace("?", "")
     print(f"Title: {title}")
     viewer = soup.find("div", {"id": "viewer"})
     divs = viewer.find_all("div", {"class": "item"})
@@ -42,7 +47,7 @@ def download_chapter(path, driver, folder):
     next_path_div = soup.find("div", {"class": "nav-next"})
     if next_path_div:
         next_path = next_path_div.find("a").attrs["href"]
-        download_chapter(next_path, driver, dir)
+        download_chapter(next_path, driver, folder)
 
 
 if __name__ == "__main__":
