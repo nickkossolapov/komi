@@ -15,8 +15,6 @@ def save_image(div, title, folder):
     img_page = img_page_full.split('/')[0].strip().zfill(3)
     print(f"Downloading image: {img_page_full}")
 
-    requests.get(img_url, headers={'User-Agent' : "Magic Browser"})
-
     image_request = requests.get(img_url, headers={'User-Agent' : "Magic Browser"})
     if image_request.status_code == 200:
         filename = f"./{folder}/{title}/{chapter}{img_page}.jpg"
@@ -28,7 +26,7 @@ def save_image(div, title, folder):
 
 def download_chapter(path, driver, folder):
     url = f"{base_url}{path}"
-    print(f"Downloading {url}")
+    print(f"\nDownloading {url}")
     driver.get(url)
 
     soup = BeautifulSoup(driver.page_source, 'html.parser')
@@ -47,13 +45,15 @@ def download_chapter(path, driver, folder):
     next_path_div = soup.find("div", {"class": "nav-next"})
     if next_path_div:
         next_path = next_path_div.find("a").attrs["href"]
-        download_chapter(next_path, driver, folder)
+        
+        if "chapter" in next_path:
+            download_chapter(next_path, driver, folder)
 
 
 if __name__ == "__main__":
     # print("Enter path: ")
     # input_path = input()
-    input_path = "/chapter/634237"
+    input_path = "/chapter/323077"
     input_folder = 'komi'
 
     options = Options()
